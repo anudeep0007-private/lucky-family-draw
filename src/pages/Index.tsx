@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, Trophy, DollarSign, Sparkles, History, Gift } from 'lucide-react';
+import { Users, Trophy, DollarSign, Sparkles, History, Gift, PhoneCall } from 'lucide-react';
 import GroupMembers from '@/components/GroupMembers';
 import LuckyDraw from '@/components/LuckyDraw';
 import WinnerHistory from '@/components/WinnerHistory';
@@ -33,7 +33,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [members, setMembers] = useState(mockMembers);
   const [drawHistory, setDrawHistory] = useState(mockHistory);
-  const [currentUser] = useState({ id: 1, name: 'அப்பா (Papa)' });
+  const [currentUser] = useState({ id: 1, name: 'அப்பா (Papa)', isAdmin: true });
   const { toast } = useToast();
 
   const paidMembers = members.filter(member => member.paid);
@@ -80,16 +80,23 @@ const Index = () => {
                 <p className="text-white/80 text-sm">குடும்ப அதிர்ஷ்ட சீட்டு</p>
               </div>
             </div>
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-              Round {drawHistory.length + 1}
-            </Badge>
+            <div className="flex items-center space-x-2">
+              <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                Round {drawHistory.length + 1}
+              </Badge>
+              {currentUser.isAdmin && (
+                <Badge variant="outline" className="border-purple-400 text-purple-300">
+                  Admin
+                </Badge>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Navigation */}
       <div className="container mx-auto px-4 py-6">
-        <div className="flex space-x-2 mb-6 bg-white/10 backdrop-blur-md rounded-lg p-2">
+        <div className="flex space-x-2 mb-6 bg-white/10 backdrop-blur-md rounded-lg p-2 overflow-x-auto">
           <Button
             variant={activeTab === 'dashboard' ? 'default' : 'ghost'}
             onClick={() => setActiveTab('dashboard')}
@@ -199,6 +206,7 @@ const Index = () => {
           <GroupMembers 
             members={members} 
             onTogglePayment={togglePaymentStatus}
+            isAdmin={currentUser.isAdmin}
           />
         )}
 
