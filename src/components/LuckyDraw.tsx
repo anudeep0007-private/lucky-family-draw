@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Trophy, Users, DollarSign, Gift, Zap, PhoneCall } from 'lucide-react';
+import { Sparkles, Trophy, Users, DollarSign, Gift, Zap, PhoneCall, Mic, MicOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
@@ -25,10 +26,22 @@ const LuckyDraw: React.FC<LuckyDrawProps> = ({ eligibleMembers, totalAmount, onD
   const [drawComplete, setDrawComplete] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [isCallDialogOpen, setIsCallDialogOpen] = useState(false);
+  const [isGroupCallActive, setIsGroupCallActive] = useState(false);
   const { toast } = useToast();
 
   const handleVoiceCall = (phoneNumber: string) => {
     window.open(`tel:${phoneNumber.replace(/\s+/g, '')}`);
+  };
+
+  const toggleGroupCall = () => {
+    setIsGroupCallActive(!isGroupCallActive);
+    
+    toast({
+      title: isGroupCallActive ? "Group Call Ended" : "Group Call Started",
+      description: isGroupCallActive 
+        ? "The group call has been ended." 
+        : "All members can now speak during the lucky draw!",
+    });
   };
 
   const startDraw = () => {
@@ -120,18 +133,87 @@ const LuckyDraw: React.FC<LuckyDrawProps> = ({ eligibleMembers, totalAmount, onD
         </CardContent>
       </Card>
 
-      {/* Voice Call During Draw */}
+      {/* Group Call Feature */}
       <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white">
         <CardHeader>
           <CardTitle className="flex items-center">
-            <PhoneCall className="w-5 h-5 mr-2 text-blue-300" />
-            Voice Call During Draw
+            {isGroupCallActive ? (
+              <Mic className="w-5 h-5 mr-2 text-green-400" />
+            ) : (
+              <MicOff className="w-5 h-5 mr-2 text-gray-400" />
+            )}
+            Group Voice Call
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center space-y-4">
             <p className="text-white/80">
-              Want to share the excitement? Make a voice call to all participants during the draw!
+              {isGroupCallActive 
+                ? "Group call is active! All members can hear and speak to each other during the draw." 
+                : "Start a group call so all members can participate in the excitement together!"}
+            </p>
+            
+            <Button 
+              onClick={toggleGroupCall}
+              className={isGroupCallActive 
+                ? "bg-red-600 hover:bg-red-700 text-white"
+                : "bg-green-600 hover:bg-green-700 text-white"}
+            >
+              {isGroupCallActive ? (
+                <>
+                  <MicOff className="w-4 h-4 mr-2" />
+                  End Group Call
+                </>
+              ) : (
+                <>
+                  <Mic className="w-4 h-4 mr-2" />
+                  Start Group Call
+                </>
+              )}
+            </Button>
+            
+            {isGroupCallActive && (
+              <div className="mt-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {eligibleMembers.slice(0, 6).map((member) => (
+                    <div key={member.id} className="bg-white/10 p-2 rounded-lg flex items-center">
+                      <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center mr-2">
+                        {member.name.charAt(0)}
+                      </div>
+                      <div className="text-xs overflow-hidden">
+                        <div className="truncate font-medium">{member.name}</div>
+                        <div className="text-white/60 truncate">{member.phone}</div>
+                      </div>
+                    </div>
+                  ))}
+                  {eligibleMembers.length > 6 && (
+                    <div className="bg-white/10 p-2 rounded-lg flex items-center justify-center">
+                      <span className="text-white/80">+{eligibleMembers.length - 6} more</span>
+                    </div>
+                  )}
+                </div>
+                
+                <p className="text-white/60 text-xs mt-3">
+                  All participants are connected. Speak clearly for everyone to hear!
+                </p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Voice Call During Draw */}
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <PhoneCall className="w-5 h-5 mr-2 text-blue-300" />
+            Individual Voice Calls
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center space-y-4">
+            <p className="text-white/80">
+              Want to share the excitement with a specific member? Make individual voice calls during the draw!
             </p>
             
             <Dialog open={isCallDialogOpen} onOpenChange={setIsCallDialogOpen}>
@@ -140,7 +222,7 @@ const LuckyDraw: React.FC<LuckyDrawProps> = ({ eligibleMembers, totalAmount, onD
                   className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <PhoneCall className="w-4 h-4 mr-2" />
-                  Start Group Voice Call
+                  Call a Member
                 </Button>
               </DialogTrigger>
               <DialogContent className="bg-gray-900 border-white/20 text-white">
