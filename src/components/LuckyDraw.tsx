@@ -3,9 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Trophy, Users, DollarSign, Gift, Zap, PhoneCall, Mic, MicOff } from 'lucide-react';
+import { Sparkles, Trophy, Users, DollarSign, Gift, Zap, Mic, MicOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 interface Member {
   id: number;
@@ -25,13 +24,8 @@ const LuckyDraw: React.FC<LuckyDrawProps> = ({ eligibleMembers, totalAmount, onD
   const [winner, setWinner] = useState<Member | null>(null);
   const [drawComplete, setDrawComplete] = useState(false);
   const [countdown, setCountdown] = useState(0);
-  const [isCallDialogOpen, setIsCallDialogOpen] = useState(false);
   const [isGroupCallActive, setIsGroupCallActive] = useState(false);
   const { toast } = useToast();
-
-  const handleVoiceCall = (phoneNumber: string) => {
-    window.open(`tel:${phoneNumber.replace(/\s+/g, '')}`);
-  };
 
   const toggleGroupCall = () => {
     setIsGroupCallActive(!isGroupCallActive);
@@ -198,70 +192,6 @@ const LuckyDraw: React.FC<LuckyDrawProps> = ({ eligibleMembers, totalAmount, onD
                 </p>
               </div>
             )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Voice Call During Draw */}
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <PhoneCall className="w-5 h-5 mr-2 text-blue-300" />
-            Individual Voice Calls
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center space-y-4">
-            <p className="text-white/80">
-              Want to share the excitement with a specific member? Make individual voice calls during the draw!
-            </p>
-            
-            <Dialog open={isCallDialogOpen} onOpenChange={setIsCallDialogOpen}>
-              <DialogTrigger asChild>
-                <Button 
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  <PhoneCall className="w-4 h-4 mr-2" />
-                  Call a Member
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-gray-900 border-white/20 text-white">
-                <DialogHeader>
-                  <DialogTitle>Call Participants</DialogTitle>
-                </DialogHeader>
-                <div className="py-4 space-y-4">
-                  <p className="text-white/80">Select a participant to call:</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {eligibleMembers.map((member) => (
-                      <Button
-                        key={member.id}
-                        variant="outline"
-                        className="justify-start border-white/20 hover:bg-white/10"
-                        onClick={() => {
-                          handleVoiceCall(member.phone);
-                          setIsCallDialogOpen(false);
-                        }}
-                      >
-                        <PhoneCall className="w-4 h-4 mr-2 text-blue-400" />
-                        <div className="text-left">
-                          <div className="font-medium">{member.name}</div>
-                          <div className="text-sm text-white/60">{member.phone}</div>
-                        </div>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex justify-end">
-                  <Button 
-                    onClick={() => setIsCallDialogOpen(false)}
-                    variant="ghost" 
-                    className="text-white hover:bg-white/10"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
           </div>
         </CardContent>
       </Card>
